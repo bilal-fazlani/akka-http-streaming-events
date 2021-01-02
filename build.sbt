@@ -9,6 +9,7 @@ lazy val root = project
       "com.typesafe.akka" %% "akka-http" % "10.2.2",
       "io.bullet" %% "borer-core" % "1.6.2",
       "io.bullet" %% "borer-derivation" % "1.6.2",
-      "io.bullet" %% "borer-compat-akka" % "1.6.2"
+      "io.bullet" %% "borer-compat-akka" % "1.6.2",
+      "ch.qos.logback" % "logback-classic" % "1.2.3"
     )
   )
