@@ -1,0 +1,18 @@
+### GET ALL
+
+GET http://localhost:9090/entities
+Accept: application/json
+
+### ADD
+
+POST http://localhost:9090/entity
+Content-Type: application/json
+
+{
+  "name": "a"
+}
+
+### DELETE
+
+DELETE http://localhost:9090/entity/681548494
+Content-Type: application/json
