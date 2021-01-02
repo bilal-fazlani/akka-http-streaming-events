@@ -7,7 +7,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import akka.util.Timeout
 import com.bilalfazlani.EntityActor.{EntityMessage, GetAll}
 import com.bilalfazlani.responses.Event
-import com.bilalfazlani.responses.Event._
+import com.bilalfazlani.responses.Event.{Added, Deleted}
 
 import scala.concurrent.Future
 import scala.util.Random

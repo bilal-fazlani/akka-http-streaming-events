@@ -10,7 +10,16 @@ lazy val root = project
   .settings(
     name := "streaming-sample"
   )
-  .aggregate(server, client)
+  .aggregate(server, client, api)
+
+lazy val api = project
+  .in(file("./api"))
+  .settings(
+    name := "streaming-server-api",
+    libraryDependencies ++= Seq(
+      Borer.`borer-derivation`
+    )
+  )
 
 lazy val server = project
   .in(file("./server"))
@@ -24,6 +33,7 @@ lazy val server = project
       Borer.`borer-derivation`
     )
   )
+  .dependsOn(api)
 
 lazy val client = project
   .in(file("./client"))
@@ -37,3 +47,4 @@ lazy val client = project
       Borer.`borer-derivation`
     )
   )
+  .dependsOn(api)
