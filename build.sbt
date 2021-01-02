@@ -1,15 +1,39 @@
+inThisBuild(
+  Seq(
+    version := "0.1.0",
+    scalaVersion := "2.13.4"
+  )
+)
+
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "streaming-sample",
-    version := "0.1.0",
-    scalaVersion := "2.13.4",
+    name := "streaming-sample"
+  )
+  .aggregate(server, client)
+
+lazy val server = project
+  .in(file("./server"))
+  .settings(
+    name := "streaming-server",
     libraryDependencies ++= Seq(
-      "com.typesafe.akka" %% "akka-stream-typed" % "2.6.10",
-      "com.typesafe.akka" %% "akka-http" % "10.2.2",
-      "io.bullet" %% "borer-core" % "1.6.2",
-      "io.bullet" %% "borer-derivation" % "1.6.2",
-      "io.bullet" %% "borer-compat-akka" % "1.6.2",
-      "ch.qos.logback" % "logback-classic" % "1.2.3"
+      Libs.`logback-classic`,
+      Akka.`akka-http`,
+      Akka.`akka-stream-typed`,
+      Borer.`borer-compat-akka`,
+      Borer.`borer-derivation`
+    )
+  )
+
+lazy val client = project
+  .in(file("./client"))
+  .settings(
+    name := "streaming-client",
+    libraryDependencies ++= Seq(
+      Libs.`logback-classic`,
+      Akka.`akka-http`,
+      Akka.`akka-stream-typed`,
+      Borer.`borer-compat-akka`,
+      Borer.`borer-derivation`
     )
   )
