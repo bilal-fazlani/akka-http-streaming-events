@@ -1,6 +1,5 @@
 package com.bilalfazlani
 
-import akka.NotUsed
 import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.sse.ServerSentEvent
@@ -12,17 +11,23 @@ import com.bilalfazlani.responses.Event.Init
 import io.bullet.borer.Json
 import io.bullet.borer.compat.AkkaHttpCompat
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.DurationInt
 
-class EntityRoutes(ao: EntityActiveObject, source: Source[Event, NotUsed])
-    extends Directives
+class EntityRoutes(ao: EntityActiveObject)(implicit
+    ec: ExecutionContext
+) extends Directives
     with AkkaHttpCompat {
   def routes: Route =
     (pathPrefix("entities") & get) {
       pathPrefix("subscribe") {
-        onSuccess(ao.getAll) { current =>
+        onSuccess(for {
+          data <- ao.getAll
+          source <- ao.subscribe()
+        } yield (data, source)) { (data, source) =>
           complete(
-            Source(Set(current))
+            Source
+              .single(data)
               .map(all => Init(all))
               .map(e =>
                 ServerSentEvent(Json.encode(e.asInstanceOf[Event]).toUtf8String)
