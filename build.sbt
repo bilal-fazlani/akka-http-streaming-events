@@ -48,3 +48,11 @@ lazy val client = project
     )
   )
   .dependsOn(api)
+
+lazy val example = project
+  .in(file("./example"))
+  .settings(
+    name := "streaming-example-client",
+    skip in publish := true
+  )
+  .dependsOn(client)

@@ -10,6 +10,7 @@ object Event {
   case class Init(entities: Set[Entity]) extends Event
   case class Added(entity: Entity) extends Event
   case class Deleted(entity: Entity) extends Event
+  case object Reset extends Event
 
   implicit val flatAdtEncoding: AdtEncodingStrategy =
     AdtEncodingStrategy.flat(typeMemberName = "_type")

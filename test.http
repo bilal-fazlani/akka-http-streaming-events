@@ -1,0 +1,19 @@
+### GET ALL
+GET http://localhost:9090/entities
+Accept: application/json
+
+### ADD
+POST http://localhost:9090/entities
+Content-Type: application/json
+
+{
+  "name": "{{$uuid}}"
+}
+
+### DELETE
+DELETE http://localhost:9090/entities/607436804
+Content-Type: application/json
+
+### RESET
+DELETE http://localhost:9090/entities
+Content-Type: application/json

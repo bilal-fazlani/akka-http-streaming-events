@@ -4,10 +4,7 @@ import akka.http.scaladsl.marshalling.sse.EventStreamMarshalling._
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.sse.ServerSentEvent
 import akka.http.scaladsl.server.{Directives, Route}
-import akka.stream.scaladsl.Source
 import com.bilalfazlani.requests.Add
-import com.bilalfazlani.responses.Event
-import com.bilalfazlani.responses.Event.Init
 import io.bullet.borer.Json
 import io.bullet.borer.compat.AkkaHttpCompat
 
@@ -18,35 +15,36 @@ class EntityRoutes(ao: EntityActiveObject)(implicit
     ec: ExecutionContext
 ) extends Directives
     with AkkaHttpCompat {
-  def routes: Route =
-    (pathPrefix("entities") & get) {
-      pathPrefix("subscribe") {
-        onSuccess(for {
-          data <- ao.getAll
-          source <- ao.subscribe()
-        } yield (data, source)) { (data, source) =>
-          complete(
-            Source
-              .single(data)
-              .map(all => Init(all))
-              .map(e =>
-                ServerSentEvent(Json.encode(e.asInstanceOf[Event]).toUtf8String)
-              )
-              .concat(
-                source
-                  .map(e => ServerSentEvent(Json.encode(e).toUtf8String))
-              )
-              .keepAlive(3.seconds, () => ServerSentEvent.heartbeat)
-          )
+  def routes: Route = {
+    pathPrefix("entities") {
+      get {
+        //subscribe
+        pathPrefix("subscribe") {
+          onSuccess(ao.subscribe()) { source =>
+            complete(
+              source
+                .map(e => ServerSentEvent(Json.encode(e).toUtf8String))
+                .keepAlive(20.seconds, () => ServerSentEvent.heartbeat)
+            )
+          }
+        } ~
+          //get all
+          complete(ao.getAll)
+      } ~
+        delete {
+          //delete one
+          pathPrefix(IntNumber) { id =>
+            onSuccess(ao.delete(id)) {
+              complete(StatusCodes.OK)
+            }
+          } ~
+            //delete all
+            complete(ao.reset())
+        } ~
+        //add new
+        (post & entity(as[Add])) { add =>
+          complete(ao.add(add.name))
         }
-      } ~ complete(ao.getAll)
-    } ~ pathPrefix("entity") {
-      (delete & pathPrefix(IntNumber)) { id =>
-        onSuccess(ao.delete(id)) {
-          complete(StatusCodes.OK)
-        }
-      } ~ (post & entity(as[Add])) { add =>
-        complete(ao.add(add.name))
-      }
     }
+  }
 }

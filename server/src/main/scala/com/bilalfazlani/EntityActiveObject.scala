@@ -20,5 +20,7 @@ class EntityActiveObject(actorRef: ActorRef[EntityMessage])(implicit
 
   def delete(id: Int): Future[Unit] = actorRef ? (Delete(id, _))
 
+  def reset(): Future[Int] = actorRef ? Reset
+
   def subscribe(): Future[Source[Event, NotUsed]] = actorRef ? Subscribe
 }
