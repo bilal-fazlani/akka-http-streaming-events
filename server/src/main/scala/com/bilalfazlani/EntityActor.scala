@@ -21,13 +21,16 @@ class EntityActor(watcher: ActorRef[Event], source: Source[Event, NotUsed]) {
     Behaviors.receiveMessagePartial[EntityMessage] {
       case EntityActor.Add(name, replyTo) =>
         val entity = Entity(Random.nextInt().abs, name)
+        val newState = state + entity
         replyTo ! entity.id
-        watcher ! Added(entity, state)
-        beh(state + entity)
+        watcher ! Added(entity, newState)
+        beh(newState)
       case EntityActor.Delete(id, replyTo) =>
         replyTo ! ()
-        state.find(_.id == id).foreach(e => watcher ! Deleted(e, state))
-        beh(state.filter(_.id != id))
+        val newState = state.filter(_.id != id)
+        if (newState != state)
+          watcher ! Deleted(state.find(_.id == id).get, newState)
+        beh(newState)
       case GetAll(replyTo) =>
         replyTo ! state
         Behaviors.same
