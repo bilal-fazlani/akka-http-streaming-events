@@ -22,11 +22,11 @@ class EntityActor(watcher: ActorRef[Event], source: Source[Event, NotUsed]) {
       case EntityActor.Add(name, replyTo) =>
         val entity = Entity(Random.nextInt().abs, name)
         replyTo ! entity.id
-        watcher ! Added(entity)
+        watcher ! Added(entity, state)
         beh(state + entity)
       case EntityActor.Delete(id, replyTo) =>
         replyTo ! ()
-        state.find(_.id == id).foreach(e => watcher ! Deleted(e))
+        state.find(_.id == id).foreach(e => watcher ! Deleted(e, state))
         beh(state.filter(_.id != id))
       case GetAll(replyTo) =>
         replyTo ! state
@@ -36,7 +36,7 @@ class EntityActor(watcher: ActorRef[Event], source: Source[Event, NotUsed]) {
         Behaviors.same
       case Reset(replyTo) =>
         replyTo ! state.size
-        watcher ! Event.Reset
+        watcher ! Event.Reset(state)
         beh(Set.empty)
     }
   }
