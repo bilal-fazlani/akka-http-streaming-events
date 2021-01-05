@@ -8,8 +8,9 @@
 |--------|---------------------|--------------------------------------------------------------------------|
 | GET    | /entities           | Get all entities                                                         |
 | GET    | /entities/subscribe | SSE Subscription of all CRUD events.  First event will be current state. |
-| POST   | /entity/\<NAME>      | Add new entity                                                           |
-| DELETE | /entity/\<ID>        | delete an entity                                                         |
+| POST   | /entities           | Add new entity                                                           |
+| DELETE | /entities/\<ID>     | delete an entity                                                         |
+| DELETE | /entities           | delete all entities                                                      |
 
 
 - "sub run"
